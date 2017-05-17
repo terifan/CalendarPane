@@ -182,12 +182,11 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 					for (Rectangle or : rects)
 					{
-						if (or.intersects(r1))
+						if (r1.intersects(or))
 						{
-							r0.translate((int)or.getWidth() + 10, 0);
-							r1.translate((int)or.getWidth() + 10, 0);
+							r0.translate(or.width + 10, 0);
+							r1.translate(or.width + 10, 0);
 							ok = false;
-							break;
 						}
 					}
 				}
