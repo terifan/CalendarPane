@@ -89,6 +89,13 @@ public class CalendarPaneRowHeaderView extends JComponent
 				}
 			}
 		}
+
+		CalendarElement el = mCalendarPane.getSelectedElement();
+		if (el != null)
+		{
+			g.setColor(new Color(235,137,0,64));
+			g.fillRect(0, el.getTimeBounds().y, getWidth(), el.getTimeBounds().height);
+		}
 	}
 
 

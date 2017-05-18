@@ -34,6 +34,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	private long mLastMouseScrollTime;
 	private Rectangle mBounds;
 	private Insets mPadding;
+	private JScrollPane mScrollPane;
 
 
 	public CalendarPane(Calendar aFirstDate, Calendar aLastDate)
@@ -85,6 +86,11 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	@Override
 	protected void paintComponent(Graphics aGraphics)
 	{
+		if (mScrollPane == null)
+		{
+			mScrollPane = (JScrollPane)SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+		}
+
 		Graphics2D g = (Graphics2D)aGraphics;
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
@@ -205,9 +211,8 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	{
 		Point msp = mMouseScrollPoint;
 
-		if (msp != null)
+		if (msp != null && mScrollPane != null)
 		{
-			JScrollPane sp = (JScrollPane)SwingUtilities.getAncestorOfClass(JScrollPane.class, CalendarPane.this);
 			PointerInfo pi = MouseInfo.getPointerInfo();
 
 			int deltaX = (pi.getLocation().x - msp.x) / 5;
@@ -223,7 +228,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 			deltaX *= deltaT;
 			deltaY *= deltaT;
 
-			Rectangle rect = sp.getViewport().getViewRect();
+			Rectangle rect = mScrollPane.getViewport().getViewRect();
 			rect.translate(deltaX, deltaY);
 			CalendarPane.this.scrollRectToVisible(rect);
 
@@ -264,7 +269,14 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 						listener.onSelection(mSelectedElement);
 					}
 
-					repaint();
+					if (mScrollPane != null)
+					{
+						mScrollPane.repaint();
+					}
+					else
+					{
+						repaint();
+					}
 				}
 			}
 		}
