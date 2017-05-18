@@ -23,13 +23,17 @@ public abstract class CalendarElement
 	protected Color mSelectedBackgroundHighlightColor;
 	protected Color mSelectedForegroundColor;
 	protected Border mBorder;
+	protected Border mUpdatedBorder;
 	protected Color mBackgroundColor;
 	protected Color mBackgroundHighlightColor;
 	protected Color mForegroundColor;
+	protected boolean mVisible;
+	protected boolean mUpdated;
 
 
 	public CalendarElement()
 	{
+		mVisible = true;
 		mText = new TextBox().setPadding(3, 3, 3, 3);
 
 		mForegroundColor = Color.BLACK;
@@ -41,6 +45,32 @@ public abstract class CalendarElement
 		mSelectedBackgroundColor = new Color(255,255,200);
 		mSelectedBackgroundHighlightColor = new Color(255,255,255,200);
 		mSelectedBorder = BorderFactory.createLineBorder(new Color(255,255,128), 2);
+
+		mUpdatedBorder = BorderFactory.createLineBorder(new Color(255,0,0), 2);
+	}
+
+
+	public boolean isVisible()
+	{
+		return mVisible;
+	}
+
+
+	public void setVisible(boolean aVisible)
+	{
+		mVisible = aVisible;
+	}
+
+
+	public boolean isUpdated()
+	{
+		return mUpdated;
+	}
+
+
+	public void setUpdated(boolean aUpdated)
+	{
+		mUpdated = aUpdated;
 	}
 
 
@@ -185,7 +215,7 @@ public abstract class CalendarElement
 		aGraphics.setColor(mSelected ? mSelectedBackgroundColor : mBackgroundColor);
 		aGraphics.fill(mTimeBounds);
 
-		(mSelected ? mSelectedBorder : mBorder).paintBorder(null, aGraphics, mVisualBounds.x, mVisualBounds.y, mVisualBounds.width, mVisualBounds.height);
+		(mUpdated ? mUpdatedBorder : mSelected ? mSelectedBorder : mBorder).paintBorder(null, aGraphics, mVisualBounds.x, mVisualBounds.y, mVisualBounds.width, mVisualBounds.height);
 
 		mText.setForeground(mSelected ? mSelectedForegroundColor : mForegroundColor).setBounds(mVisualBounds).render(aGraphics);
 	}

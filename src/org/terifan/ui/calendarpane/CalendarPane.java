@@ -12,11 +12,15 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import org.terifan.ui.PopupFactory;
 import org.terifan.util.Calendar;
 
 
@@ -35,12 +39,17 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	private Rectangle mBounds;
 	private Insets mPadding;
 	private JScrollPane mScrollPane;
+	private ViewController mViewController;
+	private Point mDragStart;
+	private boolean mWasDragged;
+	private PopupFactory<CalendarElement> mPopupFactory;
 
 
 	public CalendarPane(Calendar aFirstDate, Calendar aLastDate)
 	{
 		super.setBackground(Color.WHITE);
 		super.addMouseListener(mMouseListener);
+		super.addMouseMotionListener(mMouseMotionListener);
 
 		mBounds = new Rectangle();
 		mPadding = new Insets(0, 20, 0, 20);
@@ -50,6 +59,42 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		mElements = new ArrayList<>();
 		mSelectionListeners = new ArrayList<>();
+
+		requestFocus();
+	}
+
+
+	public ViewController getViewController()
+	{
+		return mViewController;
+	}
+
+
+	public void setViewController(ViewController aViewController)
+	{
+		this.mViewController = aViewController;
+	}
+
+
+	public PopupFactory<CalendarElement> getPopupFactory()
+	{
+		return mPopupFactory;
+	}
+
+
+	public void setPopupFactory(PopupFactory<CalendarElement> aPopupFactory)
+	{
+		mPopupFactory = aPopupFactory;
+	}
+
+
+	@Override
+	public void removeAll()
+	{
+		super.removeAll();
+
+		mBounds.setBounds(new Rectangle());
+		mElements.clear();
 	}
 
 
@@ -65,9 +110,20 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	}
 
 
-	public void add(CalendarElement aElement)
+	public void addElement(CalendarElement aElement)
 	{
+		if (aElement.getFromDate() == null || aElement.getToDate() == null)
+		{
+			throw new IllegalArgumentException("Bad element: " + aElement);
+		}
+
 		mElements.add(aElement);
+	}
+
+
+	public void removeElement(CalendarElement aElement)
+	{
+		mElements.remove(aElement);
 	}
 
 
@@ -101,7 +157,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 		g.setColor(getBackground());
 		g.fillRect(0, 0, width, height);
 
-		g.setColor(new Color(230,237,247));
+		g.setColor(new Color(230, 237, 247));
 		for (int y = 0; y < height; y += mMinorUnitHeight)
 		{
 			if (g.hitClip(0, y, width, mMinorUnitHeight + 6))
@@ -109,7 +165,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 				g.drawLine(0, y, width, y);
 			}
 		}
-		g.setColor(new Color(169,176,184));
+		g.setColor(new Color(169, 176, 184));
 		for (int y = 0; y < height; y += mMajorUnitHeight)
 		{
 			if (g.hitClip(0, y, width, mMajorUnitHeight + 6))
@@ -117,7 +173,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 				g.drawLine(0, y, width, y);
 			}
 		}
-		g.setColor(new Color(0,0,0));
+		g.setColor(new Color(0, 0, 0));
 		for (int y = 0; y < height; y += 24 * mMajorUnitHeight)
 		{
 			if (g.hitClip(0, y, width, 24 * mMajorUnitHeight + 6))
@@ -128,13 +184,16 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		for (CalendarElement element : mElements)
 		{
-			Rectangle r = element.getVisualBounds();
-
-			if (r != null && g.hitClip(r.x, r.y, r.width, r.height))
+			if (element.isVisible() && (mViewController == null || mViewController.isVisible(element)))
 			{
-				element.setSelected(element == mSelectedElement);
+				Rectangle r = element.getVisualBounds();
 
-				element.render(g);
+				if (r != null && g.hitClip(r.x, r.y, r.width, r.height))
+				{
+					element.setSelected(element == mSelectedElement);
+
+					element.render(g);
+				}
 			}
 		}
 
@@ -145,7 +204,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 			SwingUtilities.convertPointFromScreen(pt, this);
 
 			aGraphics.setColor(Color.GRAY);
-			aGraphics.fillOval(pt.x-10, pt.y-10, 20, 20);
+			aGraphics.fillOval(pt.x - 10, pt.y - 10, 20, 20);
 
 			mouseScroll();
 		}
@@ -167,10 +226,10 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		for (CalendarElement element : mElements)
 		{
-			if (element.getFromDate() != null && element.getToDate() != null)
+			if (element.isVisible() && (mViewController == null || mViewController.isVisible(element)))
 			{
-				int y0 = (int)(mMajorUnitHeight * (element.getFromDate().get() - mStartTime) / 60 / 60 / 1000);
-				int y1 = (int)(mMajorUnitHeight * (element.getToDate().get() - mStartTime) / 60 / 60 / 1000);
+				int y0 = timeToOffset(element.getFromDate().get());
+				int y1 = timeToOffset(element.getToDate().get());
 
 				Dimension d = element.getPreferredSize();
 
@@ -207,6 +266,18 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	}
 
 
+	public int timeToOffset(long aTime)
+	{
+		return (int)(mMajorUnitHeight * (aTime - mStartTime) / 60 / 60 / 1000);
+	}
+
+
+	public long offsetToTime(int aOffset)
+	{
+		return mStartTime + aOffset * 60L * 60 * 1000 / mMajorUnitHeight;
+	}
+
+
 	private void mouseScroll()
 	{
 		Point msp = mMouseScrollPoint;
@@ -221,7 +292,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 			if (deltaT == 0)
 			{
-				SwingUtilities.invokeLater(()->repaint());
+				SwingUtilities.invokeLater(() -> repaint());
 				return;
 			}
 
@@ -234,53 +305,9 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 			mLastMouseScrollTime = System.currentTimeMillis();
 
-			SwingUtilities.invokeLater(()->repaint());
+			SwingUtilities.invokeLater(() -> repaint());
 		}
 	}
-
-
-	private MouseAdapter mMouseListener = new MouseAdapter()
-	{
-		@Override
-		public void mousePressed(MouseEvent aEvent)
-		{
-			if (mMouseScrollPoint != null)
-			{
-				mMouseScrollPoint = null; // end repaint-loop
-				repaint();
-				return;
-			}
-			if (SwingUtilities.isMiddleMouseButton(aEvent))
-			{
-				mLastMouseScrollTime = System.currentTimeMillis();
-				mMouseScrollPoint = aEvent.getLocationOnScreen();
-				repaint(); // start repaint-loop
-				return;
-			}
-
-			for (CalendarElement element : mElements)
-			{
-				if (element.getVisualBounds() != null && element.getVisualBounds().contains(aEvent.getPoint()))
-				{
-					mSelectedElement = element;
-
-					for (SelectionListener listener : mSelectionListeners)
-					{
-						listener.onSelection(mSelectedElement);
-					}
-
-					if (mScrollPane != null)
-					{
-						mScrollPane.repaint();
-					}
-					else
-					{
-						repaint();
-					}
-				}
-			}
-		}
-	};
 
 
 	@FunctionalInterface
@@ -295,4 +322,115 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	{
 		return mElements.iterator();
 	}
+
+	private MouseAdapter mMouseListener = new MouseAdapter()
+	{
+		@Override
+		public void mousePressed(MouseEvent aEvent)
+		{
+			requestFocus();
+
+			if (mMouseScrollPoint != null)
+			{
+				mMouseScrollPoint = null; // end repaint-loop
+				repaint();
+				return;
+			}
+			if (SwingUtilities.isMiddleMouseButton(aEvent))
+			{
+				mLastMouseScrollTime = System.currentTimeMillis();
+				mMouseScrollPoint = aEvent.getLocationOnScreen();
+				repaint(); // start repaint-loop
+				return;
+			}
+
+			CalendarElement selectedElement = null;
+
+			for (CalendarElement element : mElements)
+			{
+				if (element.isVisible() && (mViewController == null || mViewController.isVisible(element)) && element.getVisualBounds() != null && element.getVisualBounds().contains(aEvent.getPoint()))
+				{
+					selectedElement = element;
+
+					for (SelectionListener listener : mSelectionListeners)
+					{
+						listener.onSelection(element);
+					}
+
+					repaintAll();
+				}
+			}
+
+			mSelectedElement = selectedElement;
+
+			if (SwingUtilities.isRightMouseButton(aEvent))
+			{
+				mPopupFactory.createPopup(mSelectedElement).show(CalendarPane.this, aEvent.getX(), aEvent.getY());
+				return;
+			}
+
+			if (mSelectedElement != null)
+			{
+				mDragStart = aEvent.getPoint();
+				mDragStart.y = mDragStart.y - mSelectedElement.getVisualBounds().y;
+			}
+			else
+			{
+				mDragStart = null;
+			}
+		}
+
+
+		@Override
+		public void mouseReleased(MouseEvent aEvent)
+		{
+			if (mDragStart != null && mSelectedElement != null && mWasDragged)
+			{
+				long duration = mSelectedElement.getToDate().difference(Calendar.Field.MILLISECOND, mSelectedElement.getFromDate());
+
+				mSelectedElement.getFromDate().set(offsetToTime(mSelectedElement.getTimeBounds().y));
+				mSelectedElement.getToDate().set(mSelectedElement.getFromDate().get() + duration);
+
+				mSelectedElement.setUpdated(true);
+			}
+
+			mDragStart = null;
+			mWasDragged = false;
+
+			repaintAll();
+		}
+	};
+
+
+	private void repaintAll()
+	{
+		if (mScrollPane != null)
+		{
+			mScrollPane.repaint();
+		}
+		else
+		{
+			repaint();
+		}
+	}
+
+
+	private MouseMotionListener mMouseMotionListener = new MouseMotionAdapter()
+	{
+		@Override
+		public void mouseDragged(MouseEvent aEvent)
+		{
+			if (mDragStart != null)
+			{
+				int s = 5 * 60 * 1000;
+				int y = timeToOffset(offsetToTime(aEvent.getY() - mDragStart.y) / s * s);
+
+				mSelectedElement.getTimeBounds().y = y;
+				mSelectedElement.getVisualBounds().y = y;
+				mWasDragged = true;
+
+				repaintAll();
+			}
+		}
+	};
 }
