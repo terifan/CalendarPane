@@ -76,7 +76,7 @@ public class CalendarPaneRowHeaderView extends JComponent
 		{
 			if (g.hitClip(0, y - 6, width, mMajorUnitHeight + 6))
 			{
-				Calendar calendar = new Calendar(mCalendarPane.getStartTime() + y / mMajorUnitHeight * 60 * 60 * 1000L);
+				Calendar calendar = new Calendar(mCalendarPane.getStartDate().get() + y / mMajorUnitHeight * 60 * 60 * 1000L);
 
 				if ("00:00".equals(calendar.format("HH:mm")))
 				{

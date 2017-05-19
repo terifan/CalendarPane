@@ -17,7 +17,6 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.terifan.ui.PopupFactory;
@@ -28,8 +27,8 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 {
 	private int mMajorUnitHeight = 80;
 	private int mMinorUnitHeight = 20;
-	private long mStartTime;
-	private long mEndTime;
+	private long mStartDate;
+	private long mEndDate;
 
 	private ArrayList<CalendarElement> mElements;
 	private CalendarElement mSelectedElement;
@@ -54,8 +53,8 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 		mBounds = new Rectangle();
 		mPadding = new Insets(0, 20, 0, 20);
 
-		mStartTime = aFirstDate.clone().clearTime().get();
-		mEndTime = aLastDate.clone().clearTime().get();
+		mStartDate = aFirstDate.clone().clearTime().get();
+		mEndDate = aLastDate.clone().clearTime().roll("day", 1).get();
 
 		mElements = new ArrayList<>();
 		mSelectionListeners = new ArrayList<>();
@@ -98,9 +97,15 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	}
 
 
-	public long getStartTime()
+	public Calendar getStartDate()
 	{
-		return mStartTime;
+		return new Calendar(mStartDate);
+	}
+
+
+	public Calendar getEndDate()
+	{
+		return new Calendar(mEndDate);
 	}
 
 
@@ -184,7 +189,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		for (CalendarElement element : mElements)
 		{
-			if (element.isVisible() && (mViewController == null || mViewController.isVisible(element)))
+			if (element.isEnabled() && (mViewController == null || mViewController.isVisible(element)))
 			{
 				Rectangle r = element.getVisualBounds();
 
@@ -214,7 +219,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	@Override
 	public Dimension getPreferredSize()
 	{
-		return new Dimension(mBounds.width + mPadding.left + mPadding.right, (int)((mEndTime - mStartTime) / 1000 / 60 / 60 * mMajorUnitHeight));
+		return new Dimension(mBounds.width + mPadding.left + mPadding.right, (int)((mEndDate - mStartDate) / 1000 / 60 / 60 * mMajorUnitHeight));
 	}
 
 
@@ -226,7 +231,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		for (CalendarElement element : mElements)
 		{
-			if (element.isVisible() && (mViewController == null || mViewController.isVisible(element)))
+			if (element.isEnabled())
 			{
 				int y0 = timeToOffset(element.getFromDate().get());
 				int y1 = timeToOffset(element.getToDate().get());
@@ -268,13 +273,13 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 	public int timeToOffset(long aTime)
 	{
-		return (int)(mMajorUnitHeight * (aTime - mStartTime) / 60 / 60 / 1000);
+		return (int)(mMajorUnitHeight * (aTime - mStartDate) / 60 / 60 / 1000);
 	}
 
 
 	public long offsetToTime(int aOffset)
 	{
-		return mStartTime + aOffset * 60L * 60 * 1000 / mMajorUnitHeight;
+		return mStartDate + aOffset * 60L * 60 * 1000 / mMajorUnitHeight;
 	}
 
 
@@ -348,7 +353,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 			for (CalendarElement element : mElements)
 			{
-				if (element.isVisible() && (mViewController == null || mViewController.isVisible(element)) && element.getVisualBounds() != null && element.getVisualBounds().contains(aEvent.getPoint()))
+				if (element.isEnabled() && (mViewController == null || mViewController.isVisible(element)) && element.getVisualBounds() != null && element.getVisualBounds().contains(aEvent.getPoint()))
 				{
 					selectedElement = element;
 

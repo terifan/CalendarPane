@@ -27,13 +27,13 @@ public abstract class CalendarElement
 	protected Color mBackgroundColor;
 	protected Color mBackgroundHighlightColor;
 	protected Color mForegroundColor;
-	protected boolean mVisible;
+	protected boolean mEnabled;
 	protected boolean mUpdated;
 
 
 	public CalendarElement()
 	{
-		mVisible = true;
+		mEnabled = true;
 		mText = new TextBox().setPadding(3, 3, 3, 3);
 
 		mForegroundColor = Color.BLACK;
@@ -50,15 +50,15 @@ public abstract class CalendarElement
 	}
 
 
-	public boolean isVisible()
+	public boolean isEnabled()
 	{
-		return mVisible;
+		return mEnabled;
 	}
 
 
-	public void setVisible(boolean aVisible)
+	public void setEnabled(boolean aEnabled)
 	{
-		mVisible = aVisible;
+		mEnabled = aEnabled;
 	}
 
 
@@ -128,9 +128,23 @@ public abstract class CalendarElement
 	}
 
 
+	public CalendarElement setFromDate(Calendar aFromDate)
+	{
+		mFromDate = aFromDate;
+		return this;
+	}
+
+
 	public Calendar getToDate()
 	{
 		return mToDate;
+	}
+
+
+	public CalendarElement setToDate(Calendar aToDate)
+	{
+		mToDate = aToDate;
+		return this;
 	}
 
 
@@ -192,6 +206,12 @@ public abstract class CalendarElement
 	public void setSelectedForegroundColor(Color aSelectedForegroundColor)
 	{
 		this.mSelectedForegroundColor = aSelectedForegroundColor;
+	}
+
+
+	public TextBox getText()
+	{
+		return mText;
 	}
 
 
