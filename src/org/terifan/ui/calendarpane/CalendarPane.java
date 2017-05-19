@@ -231,7 +231,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		for (CalendarElement element : mElements)
 		{
-			if (element.isEnabled())
+			if (element.isEnabled() && (mViewController == null || mViewController.isVisible(element)))
 			{
 				int y0 = timeToOffset(element.getFromDate().get());
 				int y1 = timeToOffset(element.getToDate().get());
