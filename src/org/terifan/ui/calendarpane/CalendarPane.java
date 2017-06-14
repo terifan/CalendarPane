@@ -370,7 +370,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 			if (SwingUtilities.isRightMouseButton(aEvent))
 			{
-				mPopupFactory.createPopup(mSelectedElement).show(CalendarPane.this, aEvent.getX(), aEvent.getY());
+				mPopupFactory.createPopup(mSelectedElement, aEvent.getPoint()).show(CalendarPane.this, aEvent.getX(), aEvent.getY());
 				return;
 			}
 
