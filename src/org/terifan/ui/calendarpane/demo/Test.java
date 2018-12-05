@@ -2,6 +2,8 @@ package org.terifan.ui.calendarpane.demo;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import org.terifan.ui.calendarpane.CalendarChangeListener;
+import org.terifan.ui.calendarpane.CalendarElement;
 import org.terifan.ui.calendarpane.CalendarPane;
 import org.terifan.ui.calendarpane.CalendarPaneRowHeaderView;
 import org.terifan.ui.calendarpane.SimpleCalendarElement;
@@ -20,6 +22,15 @@ public class Test
 			calendarPane.addElement(new SimpleCalendarElement(new Calendar("2018-11-01 04:00"), new Calendar("2018-11-01 08:00"), "sleeping...").setColorStyle(Style.GREEN));
 			calendarPane.addElement(new SimpleCalendarElement(new Calendar("2018-11-01 08:00"), new Calendar("2018-11-01 12:00"), "hello world"));
 			calendarPane.addElement(new SimpleCalendarElement(new Calendar("2018-11-01 12:30"), new Calendar("2018-11-01 15:00"), "blablabla blablabla blablabla blablabla blablabla").setColorStyle(Style.BLUE));
+
+			calendarPane.addChangeListener(new CalendarChangeListener()
+			{
+				@Override
+				public void elementReleased(CalendarPane aCalendarPane, CalendarElement aCalendarElement)
+				{
+					calendarPane.layoutCalendar();
+				}
+			});
 
 			calendarPane.layoutCalendar();
 
