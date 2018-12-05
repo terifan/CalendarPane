@@ -9,7 +9,6 @@ import org.terifan.ui.calendarpane.SimpleCalendarElement.Style;
 import org.terifan.util.Calendar;
 
 
-
 public class Test
 {
 	public static void main(String ... args)
