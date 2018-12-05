@@ -209,6 +209,30 @@ public abstract class CalendarElement
 	}
 
 
+	public Color getBackgroundHighlightColor()
+	{
+		return mBackgroundHighlightColor;
+	}
+
+
+	public void setBackgroundHighlightColor(Color aBackgroundHighlightColor)
+	{
+		mBackgroundHighlightColor = aBackgroundHighlightColor;
+	}
+
+
+	public Color getSelectedBackgroundHighlightColor()
+	{
+		return mSelectedBackgroundHighlightColor;
+	}
+
+
+	public void setSelectedBackgroundHighlightColor(Color aSelectedBackgroundHighlightColor)
+	{
+		this.mSelectedBackgroundHighlightColor = aSelectedBackgroundHighlightColor;
+	}
+
+
 	public TextBox getText()
 	{
 		return mText;
