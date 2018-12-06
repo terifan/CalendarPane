@@ -2,7 +2,7 @@ package org.terifan.ui.calendarpane;
 
 
 @FunctionalInterface
-public interface CalendarSelectionListener
+public interface CalendarSelectionListener<T extends CalendarElement>
 {
-	void onSelection(CalendarElement aCalendarElement);
+	void onSelection(T aCalendarElement);
 }

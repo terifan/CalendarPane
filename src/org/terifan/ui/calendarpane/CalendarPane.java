@@ -21,17 +21,17 @@ import org.terifan.ui.PopupFactory;
 import org.terifan.util.Calendar;
 
 
-public class CalendarPane extends JPanel implements Iterable<CalendarElement>
+public class CalendarPane<T extends CalendarElement> extends JPanel implements Iterable<T>
 {
 	private int mMajorUnitHeight = 80;
 	private int mMinorUnitHeight = 20;
 	private long mStartDate;
 	private long mEndDate;
 
-	private ArrayList<CalendarSelectionListener> mSelectionListeners;
-	private ArrayList<CalendarChangeListener> mChangeListeners;
-	private ArrayList<CalendarElement> mElements;
-	private CalendarElement mSelectedElement;
+	private ArrayList<CalendarSelectionListener<T>> mSelectionListeners;
+	private ArrayList<CalendarChangeListener<T>> mChangeListeners;
+	private ArrayList<T> mElements;
+	private T mSelectedElement;
 	private Point mMouseScrollPoint;
 	private long mLastMouseScrollTime;
 	private Rectangle mBounds;
@@ -40,7 +40,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	private ViewController mViewController;
 	private Point mDragStart;
 	private boolean mWasDragged;
-	private PopupFactory<CalendarElement> mPopupFactory;
+	private PopupFactory<T> mPopupFactory;
 
 
 	public CalendarPane(Calendar aFirstDate, Calendar aLastDate)
@@ -76,13 +76,13 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	}
 
 
-	public PopupFactory<CalendarElement> getPopupFactory()
+	public PopupFactory<T> getPopupFactory()
 	{
 		return mPopupFactory;
 	}
 
 
-	public void setPopupFactory(PopupFactory<CalendarElement> aPopupFactory)
+	public void setPopupFactory(PopupFactory<T> aPopupFactory)
 	{
 		mPopupFactory = aPopupFactory;
 	}
@@ -110,31 +110,31 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	}
 
 
-	public void addSelectionListener(CalendarSelectionListener aSelectionListener)
+	public void addSelectionListener(CalendarSelectionListener<T> aSelectionListener)
 	{
 		mSelectionListeners.add(aSelectionListener);
 	}
 
 
-	public void removeSelectionListener(CalendarSelectionListener aSelectionListener)
+	public void removeSelectionListener(CalendarSelectionListener<T> aSelectionListener)
 	{
 		mSelectionListeners.remove(aSelectionListener);
 	}
 
 
-	public void addChangeListener(CalendarChangeListener aChangeListener)
+	public void addChangeListener(CalendarChangeListener<T> aChangeListener)
 	{
 		mChangeListeners.add(aChangeListener);
 	}
 
 
-	public void removeChangeListener(CalendarChangeListener aChangeListener)
+	public void removeChangeListener(CalendarChangeListener<T> aChangeListener)
 	{
 		mChangeListeners.remove(aChangeListener);
 	}
 
 
-	public void addElement(CalendarElement aElement)
+	public void addElement(T aElement)
 	{
 		if (aElement.getFromDate() == null || aElement.getToDate() == null)
 		{
@@ -145,19 +145,19 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 	}
 
 
-	public void removeElement(CalendarElement aElement)
+	public void removeElement(T aElement)
 	{
 		mElements.remove(aElement);
 	}
 
 
-	public void setSelectedElement(CalendarElement aSelectedElement)
+	public void setSelectedElement(T aSelectedElement)
 	{
 		mSelectedElement = aSelectedElement;
 	}
 
 
-	public CalendarElement getSelectedElement()
+	public T getSelectedElement()
 	{
 		return mSelectedElement;
 	}
@@ -206,7 +206,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 			}
 		}
 
-		for (CalendarElement element : mElements)
+		for (T element : mElements)
 		{
 			if (element.isEnabled() && (mViewController == null || mViewController.isVisible(element)))
 			{
@@ -248,7 +248,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 		ArrayList<Rectangle> rects = new ArrayList<>();
 
-		for (CalendarElement element : mElements)
+		for (T element : mElements)
 		{
 			if (element.isEnabled() && (mViewController == null || mViewController.isVisible(element)))
 			{
@@ -335,7 +335,7 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 
 
 	@Override
-	public Iterator<CalendarElement> iterator()
+	public Iterator<T> iterator()
 	{
 		return mElements.iterator();
 	}
@@ -374,9 +374,9 @@ public class CalendarPane extends JPanel implements Iterable<CalendarElement>
 				return;
 			}
 
-			CalendarElement selectedElement = null;
+			T selectedElement = null;
 
-			for (CalendarElement element : mElements)
+			for (T element : mElements)
 			{
 				if (element.isEnabled() && (mViewController == null || mViewController.isVisible(element)) && element.getVisualBounds() != null && element.getVisualBounds().contains(aEvent.getPoint()))
 				{

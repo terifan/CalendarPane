@@ -1,13 +1,13 @@
 package org.terifan.ui.calendarpane;
 
 
-public interface CalendarChangeListener
+public interface CalendarChangeListener<T extends CalendarElement>
 {
-	default void elementDragged(CalendarPane aCalendarPane, CalendarElement aCalendarElement)
+	default void elementDragged(CalendarPane<T> aCalendarPane, T aCalendarElement)
 	{
 	}
 
-	default void elementReleased(CalendarPane aCalendarPane, CalendarElement aCalendarElement)
+	default void elementReleased(CalendarPane<T> aCalendarPane, T aCalendarElement)
 	{
 	}
 }

@@ -259,7 +259,8 @@ public abstract class CalendarElement
 		aGraphics.setColor(mSelected ? mSelectedBackgroundColor : mBackgroundColor);
 		aGraphics.fill(mTimeBounds);
 
-		(mUpdated ? mUpdatedBorder : mSelected ? mSelectedBorder : mBorder).paintBorder(null, aGraphics, mVisualBounds.x, mVisualBounds.y, mVisualBounds.width, mVisualBounds.height);
+		Border border = mUpdated ? mUpdatedBorder : mSelected ? mSelectedBorder : mBorder;
+		border.paintBorder(null, aGraphics, mVisualBounds.x, mVisualBounds.y, mVisualBounds.width, mVisualBounds.height);
 
 		mText.setForeground(mSelected ? mSelectedForegroundColor : mForegroundColor).setBounds(mVisualBounds).render(aGraphics);
 	}

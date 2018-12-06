@@ -1,7 +1,7 @@
 package org.terifan.ui.calendarpane;
 
 
-public interface ViewController
+public interface ViewController<T extends CalendarElement>
 {
-	boolean isVisible(CalendarElement aCalendarElement);
+	boolean isVisible(T aCalendarElement);
 }
