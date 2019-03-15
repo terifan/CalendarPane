@@ -12,16 +12,16 @@ import org.terifan.ui.TextBox;
 import org.terifan.util.Calendar;
 
 
-public class CalendarPaneRowHeaderView extends JComponent
+public class CalendarPaneRowHeaderView<T extends CalendarElement> extends JComponent
 {
 	private int mMajorUnitHeight = 80;
 	private int mMinorUnitHeight = 20;
 	private int mTimeBarWidth = 52;
 
-	private final CalendarPane mCalendarPane;
+	private final CalendarPane<T> mCalendarPane;
 
 
-	public CalendarPaneRowHeaderView(CalendarPane aCalendarPane)
+	public CalendarPaneRowHeaderView(CalendarPane<T> aCalendarPane)
 	{
 		mCalendarPane = aCalendarPane;
 	}
