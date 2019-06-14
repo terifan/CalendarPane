@@ -23,6 +23,8 @@ import org.terifan.util.Calendar;
 
 public class CalendarPane<T extends CalendarElement> extends JPanel implements Iterable<T>
 {
+	private static final long serialVersionUID = 1L;
+
 	private int mMajorUnitHeight = 80;
 	private int mMinorUnitHeight = 20;
 	private long mStartDate;
@@ -72,7 +74,7 @@ public class CalendarPane<T extends CalendarElement> extends JPanel implements I
 
 	public void setViewController(ViewController aViewController)
 	{
-		this.mViewController = aViewController;
+		mViewController = aViewController;
 	}
 
 
@@ -136,9 +138,13 @@ public class CalendarPane<T extends CalendarElement> extends JPanel implements I
 
 	public void addElement(T aElement)
 	{
-		if (aElement.getFromDate() == null || aElement.getToDate() == null)
+		if (aElement.getFromDate() == null)
 		{
-			throw new IllegalArgumentException("Bad element: " + aElement);
+			throw new IllegalArgumentException("Calendar element 'from' date is null: " + aElement);
+		}
+		if (aElement.getToDate() == null)
+		{
+			throw new IllegalArgumentException("Calendar element 'to' date is null: " + aElement);
 		}
 
 		mElements.add(aElement);
