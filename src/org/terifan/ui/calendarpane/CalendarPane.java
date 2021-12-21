@@ -15,15 +15,20 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import org.terifan.ui.PopupFactory;
 import org.terifan.util.Calendar;
 
 
 public class CalendarPane<T extends CalendarElement> extends JPanel implements Iterable<T>
 {
 	private static final long serialVersionUID = 1L;
+
+	public interface PopupFactory<T>
+	{
+		public JPopupMenu createPopup(T aOwner, Point aPoint);
+	}
 
 	private int mMajorUnitHeight = 80;
 	private int mMinorUnitHeight = 20;
