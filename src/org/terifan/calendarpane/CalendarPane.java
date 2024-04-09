@@ -167,10 +167,4 @@ public class CalendarPane extends JPanel
 	{
 		return (mHorizontal ? getWidth() : getHeight()) * ((aCalendar.getHour() - mStartHour) * 60 * 60 + aCalendar.getMinute() * 60 + aCalendar.getSecond()) / ((mEndHour - mStartHour) * 60 * 60);
 	}
-
-//	@Override
-//	public Dimension getPreferredSize()
-//	{
-//		return new Dimension(mBounds.width + mPadding.left + mPadding.right, (int)((mEndDate - mStartDate) / 1000 / 60 / 60 * mMajorUnitHeight));
-//	}
 }

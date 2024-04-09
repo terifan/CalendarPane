@@ -8,11 +8,20 @@ import org.terifan.util.Calendar;
 public class CalendarDot extends AbstractCalendarElement
 {
 	private final static long serialVersionUID = 1L;
+	private int mRadius;
 
 
 	public CalendarDot(Calendar aDate, Color aColor, int aOffset)
 	{
 		super(aDate, aColor, aOffset);
+		mRadius = 4;
+	}
+
+
+	public CalendarDot setRadius(int aRadius)
+	{
+		mRadius = aRadius;
+		return this;
 	}
 
 
@@ -22,7 +31,7 @@ public class CalendarDot extends AbstractCalendarElement
 		int x = aCalendarPane.dateToOffset(mDate);
 		int y = mOffset;
 
-		int r = 4;
+		int r = mRadius;
 		aGraphics.setColor(mColor);
 		aGraphics.fillOval(x - r, y - r, 1 + r * 2, 1 + r * 2);
 		r /= 2;
